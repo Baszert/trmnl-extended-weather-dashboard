@@ -20,14 +20,14 @@
           <div class="label--small text-stroke--medium absolute-desc">{{ weather_desc }}</div>
         </div>
 
-        <div class="value--large">{{ current_temp }}°</div>
+        <div class="value--xlarge">{{ current_temp }}°</div>
 
         <div class="flex flex--row  gap--large">
-          <div class="flex flex--row gap--xsmall text-stroke bg--gray-75 py--1 px--3 rounded--full">
+          <div class="flex flex--row gap--small text-stroke bg--gray-75 py--1 px--3 rounded--full">
             <span class="material-symbols-outlined">arrow_upward</span>
             <div class="">{{ today_max }}° </div>
           </div>
-          <div class="flex flex--row gap--xsmall text-stroke bg--gray-75 py--1 px--3 rounded--full">
+          <div class="flex flex--row gap--small text-stroke bg--gray-75 py--1 px--3 rounded--full">
             <span class="material-symbols-outlined">arrow_downward</span>
             <div class="">{{ today_min }}°</div>
           </div>
@@ -55,7 +55,7 @@
     <div class="rounded--xsmall flex flex--col gap--none outline">
       <div class="w--full stretch p--4 gap flex--between flex flex--col border--h-1">
 
-        {% for i in (1..8) %}
+        {% for i in (1..6) %}
         <div class="flex flex--row flex--y-center gap--small w--full">
 
           <div class="value--small">
@@ -107,7 +107,7 @@
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">air</span>
-            <span>Wind Speed</span>
+            <span>Windgeschwindigkeit</span>
           </div>
           <div class="">{{ wind_speed }} {{ wind_unit }}</div>
         </div>
@@ -115,24 +115,16 @@
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">explore</span>
-            <span>Wind Direction</span>
+            <span>Windrichtung</span>
           </div>
           <div class="">{{ wind_direction }}°</div>
-        </div>
-
-        <div class="w--full flex flex--row flex--y-center value--xxsmall">
-          <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-            <span class="material-symbols-outlined">nest_sunblock</span>
-            <span>UV Index</span>
-          </div>
-          <div class="">{{ current_uv }}</div>
         </div>
 
         {% if snowfall_today > 0 %}
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">ac_unit</span>
-            <span>Snowfall</span>
+            <span>Schneefall</span>
           </div>
           <div class="">{{ snowfall_today }} {{ snow_label}}</div>
         </div>
@@ -140,7 +132,7 @@
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">water_drop</span>
-            <span>Chance of Rain</span>
+            <span>Regenwarscheinlichkeit</span>
           </div>
           <div class="">{{ precipitation_chance }}%</div>
         </div>
@@ -149,23 +141,15 @@
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">visibility</span>
-            <span>Visibility</span>
+            <span>Sicht</span>
           </div>
           <div class="">{{ visibility }} {{ visibility_label }}</div>
         </div>
 
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-            <span class="material-symbols-outlined">airwave</span>
-            <span>Air Quality</span>
-          </div>
-          <div class="">{{ selected_aqi }}</div>
-        </div>
-
-        <div class="w--full flex flex--row flex--y-center value--xxsmall">
-          <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">fan_indirect</span>
-            <span>Pressure</span>
+            <span>Druck</span>
           </div>
           <div class="">{{ pressure }} hPa</div>
         </div>
@@ -173,7 +157,7 @@
         <div class="w--full flex flex--row flex--y-center value--xxsmall">
           <div class="flex flex--row flex--left flex--y-center gap--small stretch">
             <span class="material-symbols-outlined">wb_twilight</span>
-            <span>Total daylight</span>
+            <span>Tageslicht Dauer</span>
           </div>
           <div class="">{{ daylight_display }}</div>
         </div>
@@ -199,9 +183,9 @@
   </div>
 
   <div class="flex flex--row flex--top w--full">
-    <div class="value--xsmall">{{ location }}</div>
+    <div class="value--small">{{ location }}</div>
     <div class="stretch"></div>
-    <div class="value--xsmall">{{ current_time }}</div>
+    <div class="value--small">{{ current_time }}</div>
   </div>
 
 </div>
