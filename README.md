@@ -1,6 +1,6 @@
 # Extended Weather Dashboard
 
-A comprehensive weather dashboard plugin for [TRMNL](https://usetrmnl.com/) that displays current conditions, 8-day forecast, and detailed meteorological data on your e-ink display.
+A comprehensive weather dashboard plugin for [TRMNL](https://trmnl.com/) that displays current conditions, 8-day forecast, and detailed meteorological data on your e-ink display.
 
 <a href="https://usetrmnl.com/recipes/214872">
   <img src="https://usetrmnl.com/images/brand/badges/dark/show-it-on-trmnl/trmnl-badge-show-it-on-dark.svg" alt="TRMNL Badge" width="120">
@@ -115,6 +115,7 @@ Wind Speed Unit: km/h
 Distance Unit: Kilometers (km)
 Time Format: 24-hour (13:45)
 Air Quality Index Type: European AQI
+Bar Color: WWhite
 ```
 
 ## Credits
