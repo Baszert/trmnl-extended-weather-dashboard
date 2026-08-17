@@ -4,16 +4,40 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: "https://api.open-meteo.com/v1/forecast?latitude={{latitude}}&longitude={{longitude}}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,visibility,cloud_cover&hourly=precipitation_probability,uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,sunrise,sunset,snowfall_sum,daylight_duration&temperature_unit={{temperature_unit}}&wind_speed_unit={{wind_speed_unit}}&timezone=auto&forecast_days=9\r\nhttps://air-quality-api.open-meteo.com/v1/air-quality?latitude={{latitude}}&longitude={{longitude}}&current=us_aqi,european_aqi,pm10,pm2_5&timezone=auto"
+framework_version: 3.2.0
+serverless_language: ''
+polling_url: "https://api.open-meteo.com/v1/forecast?latitude={{latitude}}&longitude={{longitude}}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,uv_index_max,sunrise,sunset,sunshine_duration,snowfall_sum&temperature_unit={{temperature_unit}}&wind_speed_unit={{wind_speed_unit}}&timezone=auto&forecast_days=9\r\nhttps://air-quality-api.open-meteo.com/v1/air-quality?latitude={{latitude}}&longitude={{longitude}}&current=us_aqi,european_aqi,pm10,pm2_5&timezone=auto\r\nhttps://air-quality-api.open-meteo.com/v1/air-quality?latitude={{latitude}}&longitude={{longitude}}&current=us_aqi,european_aqi,pm10,pm2_5&timezone=auto"
 polling_headers: ''
 polling_body: ''
 id: 214872
+oauth_enabled: 'false'
+oauth_pkce_enabled: 'no'
+oauth_authorize_url: ''
+oauth_token_url: ''
+oauth_scopes: ''
+oauth_scope_separator: ''
+oauth_refresh_url: ''
+oauth_auth_params: ''
+oauth_token_headers: ''
+oauth_token_site: ''
+oauth_token_params: ''
+oauth_token_request_auth_method: ''
+oauth_body_format: ''
+oauth_token_response_metadata: ''
+oauth_authorization_method: ''
+oauth_refresh_params: ''
+oauth_token_field_name: ''
+oauth_expiry_field_name: ''
+oauth_expiry_strategy: ''
+oauth_fixed_expiry_ms: ''
 custom_fields:
 - name: About this plugin
   keyname: author_bio
   field_type: author_bio
-  description: Yet another weather dashboard! The current weather and the forecast of the coming days. For the extra nerdy ones, multiple datapoints are visible that has to do with the current weather. Like windspeed, wind direction, chance of rain, visibility and more. Questions or wishes? Email me.
+  description: I heard you like weather data, so i put too much weather data in a simple but stylish dashboard. Just with a glance you see what the temperature is, how moist it is outside and when the lovely sun is going down. And yeah, more. Enjoy :)
   email_address: trmnl@achtnegen.nl
+  category: nature,entertainment
+  github_url: https://github.com/Bastronautik/trmnl-extended-weather-dashboard/
 - keyname: location
   name: Location
   field_type: string
@@ -65,5 +89,14 @@ custom_fields:
   options:
   - US AQI: us_aqi
   - European AQI: european_aqi
+- keyname: bar_color
+  name: Temperature Bar Color
+  description: The background color of the bar on the left side.
+  field_type: select
+  default: white
+  options:
+  - White: white
+  - Black: black
 name: Extended Weather Dashboard
+description: Just too much weather data
 refresh_interval: 60

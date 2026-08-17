@@ -1,192 +1,140 @@
-<div class="layout layout--col gap p--2">
+{% if IDX_0.error %}
+<div class="layout">
+  <div class="bg--gray-70 p--5 rounded">
+    <div class="text text--base text--bold">No weather data</div>
+    <p class="text text--base">There is an issue getting the weather data. Please wait for the next refresh.</p>
+  </div>
+</div>
+{% else %}
 
-  <div class="grid grid--cols-3 gap--small h--full">
+<div class="layout grid grid--cols-3 h--full">
 
-    <div class="rounded--xsmall flex gap--none flex--col flex--top outline">
+{%- comment -%} ============ LEFT: PANEL (now / today) ============ {%- endcomment -%}
+  <div class="h--full text--center flex flex--col gap--xsmall lg:gap {{ panel_class }}">
 
-      <div class="stretch flex flex--col border--h-1 ">
-        <div class="value bg--gray-75 text-stroke text-stroke--large w--full py--2 relative text--center px--2">
-          {% assign weather_code = current_weather_code %}
-          {% case weather_code %}
-          {% when 0 %}{% assign icon = "wb_sunny" %}
-          {% when 1, 2 %}{% assign icon = "wb_cloudy" %}
-          {% when 3 %}{% assign icon = "cloud" %}
-          {% when 45, 48 %}{% assign icon = "foggy" %}
-          {% when 51, 53, 55, 61, 63, 65, 80, 81, 82 %}{% assign icon = "rainy" %}
-          {% when 71, 73, 75, 77, 85, 86 %}{% assign icon = "ac_unit" %}
-          {% when 95, 96, 99 %}{% assign icon = "thunderstorm" %}
-          {% else %}{% assign icon = "cloud" %}
-          {% endcase %}
-          <span class="material-symbols-outlined material-symbols-outlined--large">{{ icon }}</span>
-        </div>
-
-        <div class="flex flex--row gap w--full pl--4 pr--2">
-          <div class="value stretch">{{ current_temp }}°</div>
-          <div class="flex flex--row gap--xsmall text-stroke bg--gray-75 py--1 px--2 rounded--full">
-            <span class="material-symbols-outlined">arrow_upward</span>
-            <div class="">{{ today_max }}° </div>
-          </div>
-          <div class="flex flex--row gap--xsmall text-stroke bg--gray-75 py--1 px--2 rounded--full">
-            <span class="material-symbols-outlined">arrow_downward</span>
-            <div class="">{{ today_min }}°</div>
-          </div>
-        </div>
-
+    {%- comment -%} Hero: icon, temp, min/max {%- endcomment -%}
+    <div class="flex flex--col gap pt--3 pb--2 lg:p--3 w--full {{ header_class }}">
+      <div class="flex flex--row flex--center">
+        <i class="text--xxlarge lg:text--giga ph ph-{{ current_icon }} {{ text_style }}"></i>
+        <div class="text--xxlarge lg:text--xxxlarge {{ text_style }}">{{ current_temp }}°</div>
       </div>
-
-      <div class="flex flex--row gap--large h--14 value--xxsmall">
-        <div class="flex flex--row gap--xsmall text-stroke">
-          <span class="material-symbols-outlined">cloud</span>
-          <div class="">{{ cloud_cover }}%</div>
-        </div>
-        <div class="flex flex--row gap--xsmall text-stroke">
-          <span class="material-symbols-outlined">humidity_percentage</span>
-          <div class="">{{ humidity }}%</div>
-        </div>
-        <div class="flex flex--row gap--xsmall text-stroke">
-          <span class="material-symbols-outlined">accessibility_new</span>
-          <div class="">{{ apparent_temp }}°</div>
-        </div>
+      <div class="flex flex--center text--base gap {{ text_style }}">
+        <div class="flex flex--center gap--small"><i class="ph ph-arrow-down"></i> {{ today_min }}°</div>
+        <div class="flex flex--center gap--small"><i class="ph ph-arrow-up"></i> {{ today_max }}°</div>
       </div>
-
     </div>
 
-    <div class="rounded--xsmall flex flex--col gap--none outline">
-      <div class="w--full stretch p--3 gap--none flex flex--col border--h-1 flex--between">
-
-        {% for i in (1..4) %}
-        <div class="flex flex--row flex--y-center gap--small w--full">
-
-          <div class="value--small">
-            {% assign weather_code = forecast_codes[i] %}
-            {% case weather_code %}
-            {% when 0 %}{% assign icon = "wb_sunny" %}
-            {% when 1, 2 %}{% assign icon = "wb_cloudy" %}
-            {% when 3 %}{% assign icon = "cloud" %}
-            {% when 45, 48 %}{% assign icon = "foggy" %}
-            {% when 51, 53, 55, 61, 63, 65, 80, 81, 82 %}{% assign icon = "rainy" %}
-            {% when 71, 73, 75, 77, 85, 86 %}{% assign icon = "ac_unit" %}
-            {% when 95, 96, 99 %}{% assign icon = "thunderstorm" %}
-            {% else %}{% assign icon = "cloud" %}
-            {% endcase %}
-
-            <span class="material-symbols-outlined">{{ icon }}</span>
-          </div>
-
-          <div class="value--xxsmall">
-            {{ forecast_days[i] | date: "%a" }}
-          </div>
-
-          <div class="stretch"></div>
-
-          <div class="value--xxsmall">
-            {{ forecast_max[i] | round }}° <span class="text--gray-40">/ {{ forecast_min[i] | round }}°</span>
-          </div>
-
-        </div>
-        {% endfor %}
+    {%- comment -%} Comfort tiles (2x2) {%- endcomment -%}
+    <div class="grid grid--cols-2 gap--small px--3 lg:px--2 stretch">
+      {% if snowfall_today > 0 %}
+      <div class="rounded--small flex flex-row lg:portrait:flex--center-x lg:flex--col text--base lg:p--2 p--1 {{ text_style }} {{ block_style }}">
+        <i class="text--base lg:text--xlarge ph ph-snowflake"></i>
+        {{ snowfall_today }} {{ snow_label }}
       </div>
-
-      <div class="flex flex--row flex--between w--full p--4 gap--large h--14 value--xxsmall">
-        <div class="flex flex--row gap--xsmall text-stroke">
-          <span class="material-symbols-outlined">wb_sunny</span>
-          <div class="">{{ sunrise_time }}</div>
-        </div>
-        <div class="flex flex--row gap--xsmall text-stroke">
-          <span class="material-symbols-outlined">moon_stars</span>
-          <div class="">{{ sunset_time }}</div>
-        </div>
+      {% else %}
+      <div class="rounded--small flex flex-row lg:portrait:flex--center-x lg:flex--col text--base lg:p--2 p--1 {{ text_style }} {{ block_style }}">
+        <i class="text--large lg:text--xlarge ph ph-cloud-rain"></i>
+        {{ precipitation_chance }}%
       </div>
-
+      {% endif %}
+      <div class="rounded--small flex flex-row lg:portrait:flex--center-x lg:flex--col text--base lg:p--2 p--1 {{ text_style }} {{ block_style }}">
+        <i class="text--large lg:text--xlarge ph ph-thermometer"></i>
+        {{ apparent_temp }}°
+      </div>
+      <div class="rounded--small flex flex-row lg:portrait:flex--center-x lg:flex--col text--base lg:p--2 p--1 {{ text_style }} {{ block_style }}">
+        <i class="text--large lg:text--xlarge ph ph-drop-half"></i>
+        {{ humidity }}%
+      </div>
+      <div class="rounded--small flex flex-row lg:portrait:flex--center-x lg:flex--col text--base lg:p--2 p--1 {{ text_style }} {{ block_style }}">
+        <i class="text--large lg:text--xlarge ph ph-umbrella"></i>
+        {{ precip_sum_today }} mm
+      </div>
     </div>
 
-    <div class="rounded--xsmall flex flex--col gap--none outline">
-      <div class="grid grid--cols-2 gap--none">
-        <div>
-          <div class="flex flex--col w--full p--3 gap--medium stretch">
+    {%- comment -%} Sun/moon arc {%- endcomment -%}
+    <div class="hidden lg:portrait:flex flex--center">
+      <svg viewBox="0 0 200 112" width="100%" style="max-width:220px; display:block;" class="image--dither">
+        <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="#909090" stroke-width="2" stroke-dasharray="1.5 7" stroke-linecap="round"/>
+        <line x1="12" y1="100" x2="188" y2="100" stroke="#909090" stroke-width="1.5"/>
+        <circle cx="15" cy="100" r="4" fill="#909090"/>
+        <circle cx="185" cy="100" r="4" fill="#909090"/>
+        <circle cx="{{ sun_x }}" cy="{{ sun_y }}" r="12" fill="{{ arc_bg }}"/>
+        <circle cx="{{ sun_x }}" cy="{{ sun_y }}" r="8.5" fill="{{ arc_fg }}"/>
+        {% if arc_phase == "night" %}
+        <circle cx="{{ sun_x | plus: 4 }}" cy="{{ sun_y | minus: 3 }}" r="7.5" fill="{{ arc_bg }}"/>
+        {% endif %}
+      </svg>
+    </div>
 
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">air</span>
-              </div>
-              <div class="">{{ wind_speed }}{{ wind_unit }}</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">explore</span>
-              </div>
-              <div class="">{{ wind_direction }}°</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">nest_sunblock</span>
-              </div>
-              <div class="">{{ current_uv }}</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">water_drop</span>
-              </div>
-              <div class="">{{ precipitation_chance }}%</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">visibility</span>
-              </div>
-              <div class="">{{ visibility }}{{ visibility_label }}</div>
-            </div>
-
-          </div>
-        </div>
-        <div>
-
-          <div class="flex flex--col w--full p--3 gap--medium stretch">
-            {% if snowfall_today > 0 %}
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">ac_unit</span>
-              </div>
-              <div class="">{{ snowfall_today }} {{ snow_label}}</div>
-            </div>
-            {% endif %}
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">airwave</span>
-              </div>
-              <div class="">{{ selected_aqi }}</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                <span class="material-symbols-outlined">fan_indirect</span>
-              </div>
-              <div class="stretch text--right">{{ pressure }}hPa</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall mt--1 mb--2">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                PM2.5
-              </div>
-              <div class="stretch text--right">{{ pm25 }}</div>
-            </div>
-
-            <div class="w--full flex flex--row flex--y-center value--xxsmall">
-              <div class="flex flex--row flex--left flex--y-center gap--small stretch">
-                PM10
-              </div>
-              <div class="stretch text--right">{{ pm10 }}</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
+    {%- comment -%} Sunrise / sunset / sunshine {%- endcomment -%}
+    <div class="flex flex--row flex--evenly text--base w--full pb--3 pt--2">
+      <div class="flex flex--center gap--small"><i class="ph ph-sun-horizon"></i> {{ sunrise_time }}</div>
+      <div class="flex flex--center gap--small"><i class="ph ph-moon"></i> {{ sunset_time }}</div>
+      <div class="flex flex--center gap--small"><i class="ph ph-clock"></i> {{ sunshine_display }}</div>
     </div>
 
   </div>
 
+  {%- comment -%} ============ RIGHT: WHITE PANEL ============ {%- endcomment -%}
+  <div class="col--span-2 grid h--full">
+
+    {%- comment -%} Data grid: 3x3, uniforme tiles {%- endcomment -%}
+    <div class="flex flex--col flex--between outline gap--none stretch p--3 lg:px--5">
+
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-windmill"></i> Wind Speed</div>
+        <div class="text--base">{{ wind_speed }} {{ wind_unit }}</div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-arrow-up-right"></i> Wind Direction</div>
+        <div class="text--base">{{ wind_dir_label }}</div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-wind"></i> Wind Gusts</div>
+        <div class="text--base">{{ wind_gusts }} {{ wind_unit }}</div>
+      </div>
+
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-sunglasses"></i> UV</div>
+        <div class="text--base">{{ uv_quality }} <span class="text--base text--gray-40">{{ today_uv }}</span></div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-cloud-arrow-down"></i> Pressure</div>
+        <div class="text--base">{{ pressure }} <span class="text--base text--gray-40">hPa</span></div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-cloud"></i> Cloud Cover</div>
+        <div class="text--base">{{ cloud_cover }} <span class="text--base text--gray-40">%</span></div>
+      </div>
+
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-leaf"></i> {{ aqi_label }}</div>
+        <div class="text--base">{{ aqi_quality }} <span class="text--base text--gray-40">{{ selected_aqi }}</span></div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-circles-three"></i> PM2.5</div>
+        <div class="text--base">{{ pm25 }} <span class="text--base text--gray-40">µm/m³</span></div>
+      </div>
+      <div class="flex w--full py--1">
+        <div class="text--base flex flex--center text--bold md:stretch"><i class="text--large ph ph-circles-three-plus"></i> PM10</div>
+        <div class="text--base">{{ pm10 }} <span class="text--base text--gray-40">µm/m³</span></div>
+      </div>
+
+    </div>
+
+    {%- comment -%} Forecast: kolom 1 = dag 1-4, kolom 2 = dag 5-8 {%- endcomment -%}
+    <div class="outline p--4 flex flex--col flex--between">
+      {% for i in (1..8) %}
+      <div class="flex w--full bg--white text--base">
+        <div class="text--bold flex flex--center stretch"><i class="text--large ph ph-{{ forecast_icons[i] }}"></i> {{ forecast_days[i] | date: "%A" }}</div>
+        <div class="text--base">
+          <span class="text--bold">{{ forecast_max[i] | round }}°</span> <span class="text--gray-40 text--base">/ {{ forecast_min[i] | round }}°</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
+
+{% endif %}

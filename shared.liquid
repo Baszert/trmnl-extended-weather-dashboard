@@ -1,177 +1,244 @@
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link
+rel="stylesheet"
+type="text/css"
+href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+/>
+<link
+rel="stylesheet"
+type="text/css"
+href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+/>
 
 <style>
-    .layout {
-    font-family: "Google Sans Flex", sans-serif;
-    font-style: normal;
-  }
-  .outline {outline: 1px solid black;}
-  .material-symbols-outlined--large { font-size: 1.8em; }
+.uppercase {
+text-transform: uppercase;
+letter-spacing: 1px;
+}
 </style>
-{%- comment -%} === SYSTEM & USER DATA === {%- endcomment -%}
+
+{%- comment -%} ============================================================
+SYSTEM & USER DATA
+============================================================ {%- endcomment -%}
 {% assign utc = trmnl.system.timestamp_utc %}
 {% assign offset = trmnl.user.utc_offset %}
 {% assign local_timestamp = utc | plus: offset %}
-{% assign current_time = local_timestamp | date: "%H:%M" %}
 
-{%- comment -%} === USER SETTINGS === {%- endcomment -%}
+{%- comment -%} User settings {%- endcomment -%}
 {% assign location = trmnl.plugin_settings.custom_fields_values.location | default: "Home" %}
 {% assign color_mode = trmnl.plugin_settings.custom_fields_values.color_mode | default: "dark" %}
 {% assign aqi_type = trmnl.plugin_settings.custom_fields_values.aqi_type | default: "us_aqi" %}
 {% assign temp_unit = trmnl.plugin_settings.custom_fields_values.temperature_unit | default: "celsius" %}
-{% assign wind_unit = trmnl.plugin_settings.custom_fields_values.wind_speed_unit | default: "kmh" %}
+{% assign wind_unit = trmnl.plugin_settings.custom_fields_values.wind_speed_unit | default: "km/h" %}
+{% assign distance_unit = trmnl.plugin_settings.custom_fields_values.distance_unit | default: "km" %}
+{% assign time_format = trmnl.plugin_settings.custom_fields_values.time_format | default: "24h" %}
+{% assign bar_color = trmnl.plugin_settings.custom_fields_values.bar_color | default: "white" %}
 
-{%- comment -%} === WEATHER DATA (IDX_0) === {%- endcomment -%}
+{%- comment -%} ============================================================
+WEATHER DATA (IDX_0)
+============================================================ {%- endcomment -%}
 {% assign current = IDX_0.current %}
 {% assign hourly = IDX_0.hourly %}
 {% assign daily = IDX_0.daily %}
 
-{%- comment -%} Current Weather {%- endcomment -%}
+{%- comment -%} Current {%- endcomment -%}
 {% assign current_temp = current.temperature_2m | round %}
 {% assign current_weather_code = current.weather_code %}
 {% assign apparent_temp = current.apparent_temperature | round %}
 {% assign humidity = current.relative_humidity_2m %}
 {% assign wind_speed = current.wind_speed_10m | round %}
+{% assign wind_gusts = current.wind_gusts_10m | round %}
 {% assign wind_direction = current.wind_direction_10m %}
 {% assign pressure = current.surface_pressure | round %}
 {% assign cloud_cover = current.cloud_cover %}
+{% assign is_day = current.is_day %}
 
-{%- comment -%} Today's Min/Max {%- endcomment -%}
+{%- comment -%} Today (daily[0]) {%- endcomment -%}
 {% assign today_max = daily.temperature_2m_max[0] | round %}
 {% assign today_min = daily.temperature_2m_min[0] | round %}
+{% assign today_uv = daily.uv_index_max[0] | round: 1 %}
+{% assign precip_sum_today = daily.precipitation_sum[0] | round: 1 %}
 
-{%- comment -%} Current Hour Index (voor precipitation probability & UV) {%- endcomment -%}
+{%- comment -%} Current-hour precipitation probability {%- endcomment -%}
 {% assign current_hour = local_timestamp | date: "%H" | plus: 0 %}
 {% assign precipitation_chance = hourly.precipitation_probability[current_hour] | default: 0 %}
-{% assign current_uv = hourly.uv_index[current_hour] | round: 1 %}
 
-{%- comment -%} === AIR QUALITY DATA (IDX_1) === {%- endcomment -%}
+{%- comment -%} ============================================================
+AIR QUALITY (IDX_1)
+============================================================ {%- endcomment -%}
 {% assign aq_current = IDX_1.current %}
-
 {% assign pm25 = aq_current.pm2_5 | round: 1 %}
 {% assign pm10 = aq_current.pm10 | round: 1 %}
 {% assign us_aqi = aq_current.us_aqi %}
 {% assign eu_aqi = aq_current.european_aqi %}
 
-{%- comment -%} Selected AQI based on user preference {%- endcomment -%}
 {% if aqi_type == "us_aqi" %}
-  {% assign selected_aqi = us_aqi %}
-  {% assign aqi_label = "US AQI" %}
+{% assign selected_aqi = us_aqi %}
+{% assign aqi_label = "US AQI" %}
 {% else %}
-  {% assign selected_aqi = eu_aqi %}
-  {% assign aqi_label = "EU AQI" %}
+{% assign selected_aqi = eu_aqi %}
+{% assign aqi_label = "EU AQI" %}
 {% endif %}
 
-{%- comment -%} === 5-DAY FORECAST (skip today, use day 1-5) === {%- endcomment -%}
+{% if aqi_type == "us_aqi" %}
+{% if selected_aqi <= 50 %}{% assign aqi_quality = "Good" %}
+{% elsif selected_aqi <= 100 %}{% assign aqi_quality = "Moderate" %}
+{% elsif selected_aqi <= 150 %}{% assign aqi_quality = "Sensitive" %}
+{% elsif selected_aqi <= 200 %}{% assign aqi_quality = "Unhealthy" %}
+{% elsif selected_aqi <= 300 %}{% assign aqi_quality = "Very unhealthy" %}
+{% else %}{% assign aqi_quality = ":(" %}{% endif %}
+{% else %}
+{% if selected_aqi <= 20 %}{% assign aqi_quality = "Good" %}
+{% elsif selected_aqi <= 40 %}{% assign aqi_quality = "Fair" %}
+{% elsif selected_aqi <= 60 %}{% assign aqi_quality = "Moderate" %}
+{% elsif selected_aqi <= 80 %}{% assign aqi_quality = "Poor" %}
+{% elsif selected_aqi <= 100 %}{% assign aqi_quality = "Very poor" %}
+{% else %}{% assign aqi_quality = ":(" %}{% endif %}
+{% endif %}
+
+{%- comment -%} UV Index Quality Label {%- endcomment -%}
+{% if today_uv < 3 %}{% assign uv_quality = "Low" %}
+{% elsif today_uv < 6 %}{% assign uv_quality = "Moderate" %}
+{% elsif today_uv < 8 %}{% assign uv_quality = "High" %}
+{% elsif today_uv < 11 %}{% assign uv_quality = "Very high" %}
+{% else %}{% assign uv_quality = "Extreme" %}{% endif %}
+
+{%- comment -%} ============================================================
+TIME / SUN
+============================================================ {%- endcomment -%}
+{% if time_format == "12h" %}
+{% assign current_time = local_timestamp | date: "%I:%M %p" %}
+{% assign sunrise_time = daily.sunrise[0] | date: "%I:%M" %}
+{% assign sunset_time = daily.sunset[0] | date: "%I:%M" %}
+{% else %}
+{% assign current_time = local_timestamp | date: "%H:%M" %}
+{% assign sunrise_time = daily.sunrise[0] | date: "%H:%M" %}
+{% assign sunset_time = daily.sunset[0] | date: "%H:%M" %}
+{% endif %}
+
+{% assign sunshine_hours = daily.sunshine_duration[0] | divided_by: 3600.0 | round: 1 %}
+{% assign sunshine_display = sunshine_hours | append: "h" %}
+
+{%- comment -%} Wind direction → compass label {%- endcomment -%}
+{% if wind_direction >= 337.5 or wind_direction < 22.5 %}
+{% assign wind_dir_label = "North" %}
+{% elsif wind_direction < 67.5 %}
+{% assign wind_dir_label = "N-East" %}
+{% elsif wind_direction < 112.5 %}
+{% assign wind_dir_label = "East" %}
+{% elsif wind_direction < 157.5 %}
+{% assign wind_dir_label = "S-East" %}
+{% elsif wind_direction < 202.5 %}
+{% assign wind_dir_label = "South" %}
+{% elsif wind_direction < 247.5 %}
+{% assign wind_dir_label = "S-West" %}
+{% elsif wind_direction < 292.5 %}
+{% assign wind_dir_label = "West" %}
+{% else %}
+{% assign wind_dir_label = "N-West" %}
+{% endif %}
+
+{%- comment -%} ============================================================
+FORECAST (daily arrays, markup gebruikt index 1+)
+============================================================ {%- endcomment -%}
 {% assign forecast_days = daily.time %}
 {% assign forecast_codes = daily.weather_code %}
 {% assign forecast_max = daily.temperature_2m_max %}
 {% assign forecast_min = daily.temperature_2m_min %}
+{% assign forecast_rain = daily.precipitation_probability_max %}
+{% assign forecast_rain_mm = daily.precipitation_sum %}
+{% assign forecast_snow = daily.snowfall_sum %}
 
-{%- comment -%} Time format preference {%- endcomment -%}
-{% assign time_format = trmnl.plugin_settings.custom_fields_values.time_format | default: "24h" %}
-
-{%- comment -%} Current time {%- endcomment -%}
-{% if time_format == "12h" %}
-  {% assign current_time = local_timestamp | date: "%I:%M %p" %}
-{% else %}
-  {% assign current_time = local_timestamp | date: "%H:%M" %}
-{% endif %}
-
-{%- comment -%} Sunrise & Sunset {%- endcomment -%}
-{% if time_format == "12h" %}
-  {% assign sunrise_time = daily.sunrise[0] | date: "%I:%M" %}
-  {% assign sunset_time = daily.sunset[0] | date: "%I:%M" %}
-{% else %}
-  {% assign sunrise_time = daily.sunrise[0] | date: "%H:%M" %}
-  {% assign sunset_time = daily.sunset[0] | date: "%H:%M" %}
-{% endif %}
-
-{%- comment -%} Distance unit preference {%- endcomment -%}
-{% assign distance_unit = trmnl.plugin_settings.custom_fields_values.distance_unit | default: "km" %}
-
-{%- comment -%} Visibility conversion {%- endcomment -%}
+{%- comment -%} Snowfall today (met unit-conversie) {%- endcomment -%}
 {% if distance_unit == "mi" %}
-  {% assign visibility = current.visibility | divided_by: 1609.34 | round: 1 %}
-  {% assign visibility_label = "mi" %}
+{% assign snowfall_today = daily.snowfall_sum[0] | divided_by: 2.54 | round: 1 %}
+{% assign snow_label = "in" %}
 {% else %}
-  {% assign visibility = current.visibility | divided_by: 1000.0 | round: 1 %}
-  {% assign visibility_label = "km" %}
+{% assign snowfall_today = daily.snowfall_sum[0] | round: 1 %}
+{% assign snow_label = "cm" %}
 {% endif %}
 
-{%- comment -%} Snowfall today with unit conversion {%- endcomment -%}
-{% if distance_unit == "mi" %}
-  {% assign snowfall_today = daily.snowfall_sum[0] | divided_by: 2.54 | round: 1 %}
-  {% assign snow_label = "in" %}
-{% else %}
-  {% assign snowfall_today = daily.snowfall_sum[0] | round: 1 %}
-  {% assign snow_label = "cm" %}
-{% endif %}
-
-{%- comment -%} Daylight Duration (hours and minutes) {%- endcomment -%}
-{% assign daylight_seconds = daily.daylight_duration[0] %}
-{% assign daylight_hours = daylight_seconds | divided_by: 3600 %}
-
-{%- comment -%} Calculate remaining seconds by subtracting hours * 3600 {%- endcomment -%}
-{%- comment -%} Daylight Duration {%- endcomment -%}
-{% assign daylight_seconds = daily.daylight_duration[0] %}
-{% assign daylight_hours = daylight_seconds | divided_by: 3600.0 | round: 1 %}
-{% assign daylight_display = daylight_hours | append: "h" %}
-
-{%- comment -%} Weather Description Mapper {%- endcomment -%}
-{% assign weather_desc = "" %}
+{%- comment -%} ============================================================
+ICON MAPPING (1x hier ipv 3x in markup)
+============================================================ {%- endcomment -%}
 {% case current_weather_code %}
-  {% when 0 %}
-    {% assign weather_desc = "Clear sky" %}
-  {% when 1 %}
-    {% assign weather_desc = "Mainly clear" %}
-  {% when 2 %}
-    {% assign weather_desc = "Partly cloudy" %}
-  {% when 3 %}
-    {% assign weather_desc = "Overcast" %}
-  {% when 45, 48 %}
-    {% assign weather_desc = "Foggy" %}
-  {% when 51 %}
-    {% assign weather_desc = "Light drizzle" %}
-  {% when 53 %}
-    {% assign weather_desc = "Moderate drizzle" %}
-  {% when 55 %}
-    {% assign weather_desc = "Dense drizzle" %}
-  {% when 56, 57 %}
-    {% assign weather_desc = "Freezing drizzle" %}
-  {% when 61 %}
-    {% assign weather_desc = "Slight rain" %}
-  {% when 63 %}
-    {% assign weather_desc = "Moderate rain" %}
-  {% when 65 %}
-    {% assign weather_desc = "Heavy rain" %}
-  {% when 66, 67 %}
-    {% assign weather_desc = "Freezing rain" %}
-  {% when 71 %}
-    {% assign weather_desc = "Slight snow" %}
-  {% when 73 %}
-    {% assign weather_desc = "Moderate snow" %}
-  {% when 75 %}
-    {% assign weather_desc = "Heavy snow" %}
-  {% when 77 %}
-    {% assign weather_desc = "Snow grains" %}
-  {% when 80 %}
-    {% assign weather_desc = "Slight rain showers" %}
-  {% when 81 %}
-    {% assign weather_desc = "Moderate rain showers" %}
-  {% when 82 %}
-    {% assign weather_desc = "Violent rain showers" %}
-  {% when 85 %}
-    {% assign weather_desc = "Slight snow showers" %}
-  {% when 86 %}
-    {% assign weather_desc = "Heavy snow showers" %}
-  {% when 95 %}
-    {% assign weather_desc = "Thunderstorm" %}
-  {% when 96, 99 %}
-    {% assign weather_desc = "Thunderstorm with hail" %}
-  {% else %}
-    {% assign weather_desc = "Unknown" %}
+{% when 0 %}{% assign current_icon = "sun" %}
+{% when 1, 2 %}{% assign current_icon = "sun-dim" %}
+{% when 3 %}{% assign current_icon = "cloud" %}
+{% when 45, 48 %}{% assign current_icon = "cloud-fog" %}
+{% when 51, 53, 55, 61, 63, 65, 80, 81, 82 %}{% assign current_icon = "cloud-rain" %}
+{% when 71, 73, 75, 77, 85, 86 %}{% assign current_icon = "snowflake" %}
+{% when 95, 96, 99 %}{% assign current_icon = "lightning" %}
+{% else %}{% assign current_icon = "cloud" %}
 {% endcase %}
+
+{% assign forecast_icons = "" %}
+{% for code in daily.weather_code %}
+{% case code %}
+{% when 0 %}{% assign ic = "sun" %}
+{% when 1, 2 %}{% assign ic = "sun-dim" %}
+{% when 3 %}{% assign ic = "cloud" %}
+{% when 45, 48 %}{% assign ic = "cloud-fog" %}
+{% when 51, 53, 55, 61, 63, 65, 80, 81, 82 %}{% assign ic = "cloud-rain" %}
+{% when 71, 73, 75, 77, 85, 86 %}{% assign ic = "snowflake" %}
+{% when 95, 96, 99 %}{% assign ic = "lightning" %}
+{% else %}{% assign ic = "cloud" %}
+{% endcase %}
+{% assign forecast_icons = forecast_icons | append: ic | append: "," %}
+{% endfor %}
+{% assign forecast_icons = forecast_icons | split: "," %}
+
+{%- comment -%} ============================================================
+SUN/MOON ARC POSITION
+Fractie tussen sunrise↔sunset (dag) of sunset↔sunrise (nacht),
+gemapt op bucket 2–18 zodat het bolletje vrij van de hoeken blijft.
+============================================================ {%- endcomment -%}
+{% assign now_s = local_timestamp %}
+{% assign sunrise_s = daily.sunrise[0] | date: "%s" | plus: 0 %}
+{% assign sunset_s = daily.sunset[0] | date: "%s" | plus: 0 %}
+
+{% if now_s >= sunrise_s and now_s <= sunset_s %}
+{% assign arc_phase = "day" %}
+{% assign seg_start = sunrise_s %}
+{% assign seg_end = sunset_s %}
+{% elsif now_s > sunset_s %}
+{%- comment -%} Avond: sunset vanavond → sunrise morgen {%- endcomment -%}
+{% assign arc_phase = "night" %}
+{% assign seg_start = sunset_s %}
+{% assign seg_end = daily.sunrise[1] | date: "%s" | plus: 0 %}
+{% else %}
+{%- comment -%} Na middernacht, voor dageraad: nachtlengte benaderen {%- endcomment -%}
+{% assign arc_phase = "night" %}
+{% assign day_len_today = sunset_s | minus: sunrise_s %}
+{% assign night_len = 86400 | minus: day_len_today %}
+{% assign seg_start = sunrise_s | minus: night_len %}
+{% assign seg_end = sunrise_s %}
+{% endif %}
+
+{% assign seg_len = seg_end | minus: seg_start %}
+{% if seg_len <= 0 %}{% assign seg_len = 1 %}{% endif %}
+{% assign elapsed = now_s | minus: seg_start %}
+{% assign arc_bucket = elapsed | times: 16 | divided_by: seg_len | plus: 2 %}
+{% if arc_bucket < 2 %}{% assign arc_bucket = 2 %}{% endif %}
+{% if arc_bucket > 18 %}{% assign arc_bucket = 18 %}{% endif %}
+
+{% assign arc_x = "15.0,16.0,19.2,24.3,31.2,39.9,50.0,61.4,73.7,86.7,100.0,113.3,126.3,138.6,150.0,160.1,168.8,175.7,180.8,184.0,185.0" | split: "," %}
+{% assign arc_y = "100.0,86.7,73.7,61.4,50.0,39.9,31.2,24.3,19.2,16.0,15.0,16.0,19.2,24.3,31.2,39.9,50.0,61.4,73.7,86.7,100.0" | split: "," %}
+{% assign sun_x = arc_x[arc_bucket] %}
+{% assign sun_y = arc_y[arc_bucket] %}
+
+{%- comment -%} === PANEL STYLING (bar_color: white | black) === {%- endcomment -%}
+{% if bar_color == "white" %}
+{% assign panel_class = "outline text--black" %}
+{% assign header_class = "bg--gray-75 lg:bg--gray-70 rounded-tl rounded-tr" %}
+{% assign block_style = "lg:bg--gray-70" %}
+{% assign text_style = "text-stroke text-stroke--large" %}
+{% assign arc_bg = "#ffffff" %}
+{% assign arc_fg = "#000000" %}
+{% else %}
+{% assign panel_class = "bg--black text--white rounded" %}
+{% assign header_class = "" %}
+{% assign block_style = "lg:bg--gray-15" %}
+{% assign text_style = "" %}
+{% assign arc_bg = "#000000" %}
+{% assign arc_fg = "#ffffff" %}
+{% endif %}
