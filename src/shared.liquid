@@ -10,7 +10,7 @@ href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
 />
 
 <style>
-.uppercase {
+.ewd-uppercase {
 text-transform: uppercase;
 letter-spacing: 1px;
 }
@@ -113,8 +113,8 @@ TIME / SUN
 ============================================================ {%- endcomment -%}
 {% if time_format == "12h" %}
 {% assign current_time = local_timestamp | date: "%I:%M %p" %}
-{% assign sunrise_time = daily.sunrise[0] | date: "%I:%M" %}
-{% assign sunset_time = daily.sunset[0] | date: "%I:%M" %}
+{% assign sunrise_time = daily.sunrise[0] | date: "%-I:%M%p" %}
+{% assign sunset_time = daily.sunset[0] | date: "%-I:%M%p" %}
 {% else %}
 {% assign current_time = local_timestamp | date: "%H:%M" %}
 {% assign sunrise_time = daily.sunrise[0] | date: "%H:%M" %}
@@ -158,9 +158,11 @@ FORECAST (daily arrays, markup gebruikt index 1+)
 {% if distance_unit == "mi" %}
 {% assign snowfall_today = daily.snowfall_sum[0] | divided_by: 2.54 | round: 1 %}
 {% assign snow_label = "in" %}
+{% assign snow_factor = 0.3937 %}
 {% else %}
 {% assign snowfall_today = daily.snowfall_sum[0] | round: 1 %}
 {% assign snow_label = "cm" %}
+{% assign snow_factor = 1 %}
 {% endif %}
 
 {%- comment -%} ============================================================

@@ -138,7 +138,7 @@
       <div class="w--full">
         {% for i in (1..4) %}
         <div class="flex flex--col w--full gap--small flex--left py--3 px--4 {% if i != 4 %}border--h-1{% endif %}">
-          <div class="text--bold text--small uppercase">{{ forecast_days[i] | date: "%A %-d %B" }}</div>
+          <div class="text--bold text--small ewd-uppercase">{{ forecast_days[i] | date: "%A %-d %B" }}</div>
           <div class="flex flex--center w--full">
             <div class="stretch flex flex--center">
               <i class="text--xxlarge ph ph-{{ forecast_icons[i] }}"></i>
@@ -149,7 +149,7 @@
               {% endif %}
               {% if forecast_snow[i] > 0 %}
               <span class="bg--gray-70 py--1 px--2 rounded--full text--small flex flex--center gap--xsmall">
-                <i class="text--base ph ph-snowflake"></i> {{ forecast_snow[i] | round: 1 }}cm
+                <i class="text--base ph ph-snowflake"></i> {{ forecast_snow[i] | times: snow_factor | round: 1 }}{{ snow_label }}
               </span>
               {% endif %}
             </div>
@@ -164,7 +164,7 @@
       <div class="w--full">
         {% for i in (5..8) %}
         <div class="flex flex--col w--full gap--small flex--left py--3 px--4 border--v-1 {% if i != 8 %}border--h-1{% endif %}">
-          <div class="text--bold text--small uppercase">{{ forecast_days[i] | date: "%A %-d %B" }}</div>
+          <div class="text--bold text--small ewd-uppercase">{{ forecast_days[i] | date: "%A %-d %B" }}</div>
           <div class="flex flex--center w--full">
             <div class="stretch flex flex--center">
               <i class="text--xxlarge ph ph-{{ forecast_icons[i] }}"></i>
@@ -175,7 +175,7 @@
               {% endif %}
               {% if forecast_snow[i] > 0 %}
               <span class="bg--gray-70 py--1 px--2 rounded--full text--small flex flex--center gap--xsmall">
-                <i class="text--base ph ph-snowflake"></i> {{ forecast_snow[i] | round: 1 }}cm
+                <i class="text--base ph ph-snowflake"></i> {{ forecast_snow[i] | times: snow_factor | round: 1 }}{{ snow_label }}
               </span>
               {% endif %}
             </div>
