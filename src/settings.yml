@@ -37,7 +37,6 @@ custom_fields:
   description: I heard you like weather data, so i put too much weather data in a simple but stylish dashboard. Just with a glance you see what the temperature is, how moist it is outside and when the lovely sun is going down. And yeah, more. Enjoy :)
   email_address: trmnl@achtnegen.nl
   category: nature,entertainment
-  github_url: https://github.com/Bastronautik/trmnl-extended-weather-dashboard/
 - keyname: location
   name: Location
   field_type: string
