@@ -33,6 +33,12 @@ SYSTEM & USER DATA
 {% assign time_format = trmnl.plugin_settings.custom_fields_values.time_format | default: "24h" %}
 {% assign bar_color = trmnl.plugin_settings.custom_fields_values.bar_color | default: "white" %}
 
+{%- comment -%} Display label for the wind unit (API values: kmh, ms, mph, kn) {%- endcomment -%}
+{% case wind_unit %}
+{% when "kmh" %}{% assign wind_unit = "km/h" %}
+{% when "ms" %}{% assign wind_unit = "m/s" %}
+{% endcase %}
+
 {%- comment -%} ============================================================
 WEATHER DATA (IDX_0)
 ============================================================ {%- endcomment -%}
